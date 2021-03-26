@@ -86,16 +86,16 @@ Or methods defined for functions:
 	class Shape {
 	   //extension point
 	   void drawBoundary() { 
-           //no-op
-           out.print("draw nothing");
-       }
-       //extension point
-       void fillColor() { 
-           //no-op
-           out.print("fill nothing");
-       }
-       //logic reused in subclasses
-       void draw() {
+           	//no-op
+           	out.print("draw nothing");
+       	   }
+           //extension point
+           void fillColor() { 
+           	//no-op
+           	out.print("fill nothing");
+           }
+       	   //logic reused in subclasses
+           void draw() {
 	      drawBoundary();
 	      fillColor();
 	   }
@@ -145,7 +145,7 @@ Or methods defined for functions:
 ```
    In Go, use embedding for inheritance and define methods in OuterType to override/shadow methods in InnerType:
 ```go
-    //embed base struct for inheritance
+        //embed base struct for inheritance
 	type RedRectangle struct {
 	     *ShapeBase
 	}
