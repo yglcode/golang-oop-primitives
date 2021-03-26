@@ -15,16 +15,19 @@ type Shape interface {
 
 //base struct and methods to be embedded/inherited
 type ShapeBase struct{}
+
 //to be overriden
 func (sb *ShapeBase) drawBoundary() {
 	//no-op
 	fmt.Print("draw nothing")
 }
+
 //to be overriden
 func (sb *ShapeBase) fillColor() {
 	//no-op
 	fmt.Print("fill nothing")
 }
+
 //draw() consumes polymorphic behaviours,
 //so make it accept interface as 1st argument
 func (_ *ShapeBase) draw(sb Shape) {
@@ -38,10 +41,12 @@ func (_ *ShapeBase) draw(sb Shape) {
 type Circle struct {
 	*ShapeBase
 }
+
 func NewCircle() *Circle {
 	return &Circle{&ShapeBase{}}
 }
-//override
+
+//override base method
 func (c *Circle) drawBoundary() {
 	fmt.Print("Circle")
 }
@@ -50,31 +55,35 @@ func (c *Circle) drawBoundary() {
 type RedRectangle struct {
 	*ShapeBase
 }
-//override
+
 func NewRedRectangle() *RedRectangle {
 	return &RedRectangle{&ShapeBase{}}
 }
-//override
+
+//override base method
 func (rt *RedRectangle) drawBoundary() {
 	fmt.Print("Rectangle")
 }
-//override
+
+//override base method
 func (rt *RedRectangle) fillColor() {
 	fmt.Print("Red")
 }
 
-//embed base struct for extension
+//embed Circle for extension
 type BlueCircleWithText struct {
 	*Circle
 }
-//override
+
 func NewBlueCircleWithText() *BlueCircleWithText {
 	return &BlueCircleWithText{&Circle{}}
 }
+
 //override
 func (bct *BlueCircleWithText) fillColor() {
 	fmt.Print("Blue")
 }
+
 //override and extend
 func (bct *BlueCircleWithText) draw(s Shape) {
 	//extend superclass's draw()
@@ -94,7 +103,7 @@ func main() {
 		NewBlueCircleWithText(),
 	}
 	for _, s := range shapes {
-		//note: we have to pass in thru interface value 
+		//note: we have to pass in thru interface value
 		//for polymorphism
 		s.draw(s)
 		fmt.Println()
