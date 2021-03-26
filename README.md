@@ -76,8 +76,8 @@ Or methods defined for functions:
    
    By combining these OOP primitives (matching their counterparts in Java class), we can achieve some traditional OOP designs with simple rules: 
    
-   - every (class like) entity with methods which wants polymorphic behaviour(virtual) should define its "virtual" methods in an related interface.
-   - every method which consume polymorphic behaviours should accept this interface as argument (probably the 1st argument, since many OO language(such as Java) is single-dispatch: dynamically dispacthed based on virtual method table of the 1st (hidden) "self"/"this" argument). In Go all methods are early-bound (not virtual), so we have to pass it as interface value in arguments to achieve dynamic dispactching.
+   - every (class like) entity with methods which **provides** polymorphic behaviour(virtual) should define its "virtual" methods in an related interface.
+   - every method which **consumes** polymorphic behaviours should accept this interface as argument (probably the 1st argument, since many OO language(such as Java) is single-dispatch: dynamically dispacthed based on virtual method table of the 1st (hidden) "self"/"this" argument). In Go all methods are early-bound (not virtual), so we have to pass it as interface value in arguments to achieve dynamic dispactching.
    - pass objects thru interface (maybe as 1st argument) and call methods thru interface to achieve virtual/dynamic dispatching.
    - use embedding to simulate inheritance, and shadowing for overriding.
 
