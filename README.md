@@ -32,7 +32,7 @@ Or methods defined for functions:
 	   value string
 	   edges []*Edge
 	}
-	func (p Node) AddEdge(e *Edge) {...}
+	func (p *Node) AddEdge(e *Edge) {...}
 ```
    All these methods are by default (or by itself) early-bound and statically dispatched (not virtual). They are only dynamically dispatched when invoked thru interfaces (more on this later).
 
@@ -40,7 +40,7 @@ Or methods defined for functions:
 
    In traditional OOP, one purpose of inheritance is for code reuse: subclasses inherit(or embed in layout) properties and methods of superclass. And inheritance set up "is-a" relation among two types: subclass can be used in anywhere superclass is expected.
    
-   In Go, [embedding](https://golang.org/ref/spec#Struct_types) is used for code-reuse:
+   In Go, a "outer" struct type can [embed](https://golang.org/ref/spec#Struct_types) another "inner" type to reuse inner's code and logic :
 ```go
 	type OuterType struct {
 		InnerType1
@@ -48,13 +48,13 @@ Or methods defined for functions:
 		...
 	}
 ```
-   InnerTypes' fields and methods are _**promoted**_ (accessible by selector) at OuterType; however it is more delegation (has-a relation) than subtyping: OuterType doesn't inherit InnerType, they are independent types:
+   InnerTypes' fields and methods are _**promoted**_ (accessible by selector) at OuterType; however it is more delegation (has-a relation) than subtyping: OuterType is not a subtype of InnerType, they are independent types:
    - OuterType cannot be used where InnerType is expected.
    - OuterType doesnot contain(embed) InnerTypes' properties directly; when constructing OuterType, embedded InnerType has to be constructed explicitly.
    - Although InnerTypes' method are promoted and can be invoked at OuterType, its target is still InnerType.
    - So we cannot build type hierarchy in Go thru embedding as in Java thru inheritance.
 
-   Shadowing: If OuterType defines a method with same signature as InnerType, this method at OutType will hide its counterpart at InnerType.
+   Shadowing: If OuterType defines a method with same signature as InnerType, this method at OutType will hide its counterpart of InnerType at invocation.
 
 ### **3. Interface: for polymorphism.** ###
 
