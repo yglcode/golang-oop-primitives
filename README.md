@@ -90,11 +90,11 @@ Or methods defined for functions:
            out.print("draw nothing");
        }
        //extension point
-	   void fillColor() { 
+       void fillColor() { 
            //no-op
            out.print("fill nothing");
        }
-	   //logic reused in subclasses
+       //logic reused in subclasses
        void draw() {
 	      drawBoundary();
 	      fillColor();
@@ -206,6 +206,6 @@ Or methods defined for functions:
 	}
 ```
    Again, although we can simulate traditional OOP by combining Go's OOP primitives, it is not encouraged practice.
-   [Java](https://github.com/yglcode/golang-oop-primitives/TemplateMethods.java) and [Go code](https://github.com/yglcode/golang-oop-primitives/go-oop-template-method.go) can be found at [https://github.com/yglcode/golang-oop-primitives](https://github.com/yglcode/golang-oop-primitives).
+   [Java](https://github.com/yglcode/golang-oop-primitives/blob/main/TemplateMethods.java) and [Go code](https://github.com/yglcode/golang-oop-primitives/blob/main/go-oop-template-method.go) can be found at [https://github.com/yglcode/golang-oop-primitives](https://github.com/yglcode/golang-oop-primitives).
 
 
