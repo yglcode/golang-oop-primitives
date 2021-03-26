@@ -103,6 +103,7 @@ Or methods defined for functions:
 ```
    In Go, define these two virtual methods in a separate interface and make draw() in related base struct take interface as 1st argument:
 ```go
+	//interface to replace virtual method table in related Java class
 	type Shape interface {
 	   drawBoundary()
 	   fillColor()
