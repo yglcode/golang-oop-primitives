@@ -1,6 +1,6 @@
 ## Golang OOP primitives ##
 
-### _and combine them to do traditional OOP thru "self referential interface"_ ###
+### _and combine them to do traditional OOP thru "Embedding Interface"_ ###
    
 
 Golang is not a traditional object oriented programming language. Instead, it distilled a few OO programming primitives and allow you to compose them to achieve different OO designs.
@@ -8,7 +8,7 @@ Golang is not a traditional object oriented programming language. Instead, it di
 ### **1. Methods (or method-set): for "abstract data types"** ###
 
    In traditional OOP, methods are inherently bound with class and objects.
-   In Go, methods can be defined for any "named" types. Instead of everything is an object as in some OO language, everything (almost) can be attached methods.
+   In Go, methods can be defined for any ["named"/"defined"](https://golang.org/ref/spec#Type_definitions) types. Instead of everything is an object as in some OO language, everything (almost) can be attached methods.
 
    So we can have methods defined for integers:
 ```go
@@ -62,13 +62,13 @@ Or methods defined for functions:
    
    In Go, interfaces play the role (contains) the virtual method table [[Ian Lance Taylor blog](https://www.airs.com/blog/archives/277)]. If you invoke a object's method directly on itself, it is statically dispatched. If you assign an object to an interface value and invoke methods thru the interface, they are dynamically dispatched. 
 
-   However interfaces are independent entites separate from structs or others (class-like entities) with methods. It allows **consumers** to specify in interface what polymorphic behaviors it is expecting. Totally unrelated components can satisfy/provide the same interface independently and implicitly (no need for "implements"). While in Java, all classes which satisfy the same interface or VMT (ie. all interface **providers**) must be in the same class tree.
+   However Go interfaces are independent entities separate from structs or others (class-like entities) with methods. All Go methods are early bound and statically dispatched by default. Interface allows **consumers** to specify what polymorphic behaviors it is expecting. Totally unrelated components can satisfy/provide the same interface independently and implicitly (no need for "implements"). While in Java, all classes which provide/implement Java interface or VMT (ie. all interface **providers**) must be in the same class tree as interface.
    
    Interfaces can embed other interfaces; this interface embedding setup "is-a" relation among OuterInterface and InnerInterface: OuterInterface can be used where InnerInterface is required. So we can build hierarchy of abstractions only with interfaces, without implementation details.
  
 ### **4. How to use these primitives for traditional inheritance based OOP:** ###
 
-   In traditional OOP (Java), classes integrate the above 3 OOP primitives into a unseparatable whole: methods, inheritance/embedding, virtual method table and overrides. This integration results in some advanced [design patterns](https://en.wikipedia.org/wiki/Design_Patterns) whose advatanges and disadvantages are broadly known.
+   In traditional OOP (Java), classes integrate the above 3 OOP primitives into a unseparatable whole: methods, inheritance/embedding, virtual method table and overrides. This integration results in some class hierarchy based [design patterns](https://en.wikipedia.org/wiki/Design_Patterns) whose advatanges and disadvantages are broadly known.
    
    Go is flatly against these designs based on class hierarch compositions. Go's disintegration of these OOP primitives also guard against these kind of designs. That make people think/complain Go is not a OOP language.
    
@@ -76,14 +76,15 @@ Or methods defined for functions:
    
    By combining these OOP primitives (matching their counterparts in Java class), we can achieve some traditional OOP designs with simple rules: 
    
-   - every (class like) entity with methods which **provides** polymorphic behaviour(virtual) should define its "virtual" methods in an related interface.
-   - every method which **consumes** polymorphic behaviours should accept this interface as argument (probably the 1st argument, since many OO language(such as Java) is single-dispatch: dynamically dispacthed based on virtual method table of the 1st (hidden) "self"/"this" argument). In Go all methods are early-bound (not virtual), so we have to pass it as interface value in arguments to achieve dynamic dispactching.
-   - pass objects thru interface (maybe as 1st argument) and call methods thru interface to achieve virtual/dynamic dispatching.
-   - use embedding to simulate inheritance, and shadowing for overriding.
+   - every (class like) entity with methods which **provides** polymorphic behaviour(virtual) should define its "virtual" methods in an related "base" interface (corresponding to virtual method table in Java).
+   - define a "abstract" base struct which embed the above "base" interface: common OO language(such as Java) use single-dispatch: methods are dynamically dispacthed based on virtual method table of the 1st (hidden) "self"/"this" argument. To achieve this in Go, define a "abstract" base struct which embed the above "base" interface. Since the default value of interface is nil, the methods in this base struct are "abstract".
+   - use embedding for inheritance: extend the above abstract base struct by embedding it in outer structs.
+   - use shadowing for method overriding: in outer struct, define methods with same signature as methods in "base" interface to override them.
+   - constructor pattern: define constructor for new outer structs, in constructor, assign/override the embedded "base" interface with newly created instance, so the embedded "base" interface will take latest overriding methods.
 
    Let's implement the ["template methods"](https://en.wikipedia.org/wiki/Template_method_pattern) design pattern using Go.
    
-   In the following Java class Shape, we have two (virtual) methods "drawBoundary(), fillColor()" for extension in subclasses, define reused logic in draw():
+   In the following Java class Shape, we have three (virtual) methods "drawBoundary(), fillColor()" for extension in subclasses, define reused logic in draw():
 ```java
 	class Shape {
 	   //extension point
@@ -103,33 +104,54 @@ Or methods defined for functions:
 	   }
 	}
 ```
-   In Go, define these two virtual methods in a separate interface and make draw() in related base struct take interface as 1st argument:
+   In Go, define these three virtual methods in a "base" interface and define a "abstract" struct to embed this "base" interface. And we can define reused logic in draw() method with this "abstract" struct following "template methods" design pattern.
 ```go
 	//interface to replace virtual method table in related Java class
 	type Shape interface {
 	   drawBoundary()
 	   fillColor()
+	   draw()
 	}
-	//ShapeBase is the base struct to be embedded(inherited)
-	type ShapeBase struct{}
-	//to be overriden
-	func(sb *ShapeBase) drawBoundary() {
-	   fmt.Print("draw nothing")
+	//embed interface to define abstract base class in OOP
+	//1. outer structs (embedding this) will "inherit" these interface methods.
+	//2. the interface value is nil here, so methods are "abstract".
+	type ShapeAbstract struct {
+		Shape
 	}
-	//to be overriden
-	func(sb *ShapeBase) fillColor() {
-	   fmt.Print("fill nothing")
+
+	//define logic reused in child classes
+	func (sa ShapeAbstract) draw() {
+		//following template methods design pattern
+		//invoke "abstract" methods (defined in interface)
+		sa.drawBoundary()
+		fmt.Print("-")
+		sa.fillColor()
 	}
-	//draw() consume polymorphic methods, so make it 
-	//take Shape interface as 1st argument
-	//in Java, ShapeBase itself will be polymorphic (with VMT),
-	//in Go, all methods are early-bound(not virtual). 
-	//So we have to pass in interface as argument separately
-	func(_ *ShapeBase) draw(sb Shape) {
-	   //call methods thru interface for
-	   //polymorphism and dynamic dispatching
-	   sb.drawBoundary()
-	   sb.fillColor()
+```
+   Then define a base struct to extend/embed this "abstract" struct and define placeholder methods. Please note the "constructor pattern" which overrides embedded "Shape" interface value with newly created object.
+```go
+	//extends "abstract class" with placeholder methods implementations
+	type ShapeBase struct {
+		*ShapeAbstract
+	}
+
+	//common constructor pattern:
+	//override Shape interface value with newly created object.
+	//so interface will take latest overriding methods, exactly how OOP overrides works
+	func NewShapeBase() *ShapeBase {
+		sb := &ShapeBase{&ShapeAbstract{}}
+		sb.Shape = sb
+		return sb
+	}
+	//override abstract method
+	func (sb *ShapeBase) drawBoundary() {
+		//no-op
+		fmt.Print("draw nothing")
+	}
+	//override abstract method
+	func (sb *ShapeBase) fillColor() {
+		//no-op
+		fmt.Print("fill nothing")
 	}
 ```
    In Java, we can extends the above Shape class with variance:
@@ -146,14 +168,18 @@ Or methods defined for functions:
 	Shape[] shapes = {new Shape(),new RedRectangle()};
 	for(Shape s: shapes) { s.draw(); }
 ```
-   In Go, use embedding for inheritance and define methods in OuterType to override/shadow methods in InnerType:
+   In Go, use embedding for inheritance and please note the "constructor pattern" which overrides the embedded Shape interface value with newly created object.
 ```go
         //embed base struct for inheritance
 	type RedRectangle struct {
 	     *ShapeBase
 	}
+	//in constructor, assign newly created object to Shape interface value.
+	//so interface will take latest overriding methods.
 	func NewRedRectangle() *RedRectangle {
-	     return &RedRectangle{&ShapeBase{}}
+		rr := &RedRectangle{NewShapeBase()}
+		rr.Shape = rr
+		return rr
 	}
 	//override base method
 	func(rr RedRectangle) drawBoundary() {
@@ -165,9 +191,7 @@ Or methods defined for functions:
 	}
 	//create array of shapes and call draw() method on each
 	shapes := []Shape{NewRedRectangle(),NewCircle(),...}
-	//note here: we have to pass in Shape instance "s" 
-	//to achieve(consume) polymorphic behaviour
-	for _,s := range shapes { s.draw(s) }
+	for _,s := range shapes { s.draw() }
 ```
    Finally, all methods in Java are virtual, so we can override draw() itself for extended behaviour:
 ```java
@@ -184,28 +208,29 @@ Or methods defined for functions:
 	   }
 	}
 ```
-   In Go, add draw() to interface to make draw() overridable; thus we have **_self referential interface_** whose methods refer to the interface itself; that often exist because methods which consume polymorphic behaviour need to be polymorphic (overridable/virtual) itself.
+   In Go, since an outer struct can embed multiple inner types, it is in fact multiple inheritance. So when override and extend draw() method, we have to name the "super" or InnerType explicitly to invoke its draw() method.
 ```go
-	type Shape interface {
-	   drawBoundary()
-	   fillColor()
-	   draw(Shape)
-	}
+	//embed Circle for extension
 	type BlueCircleWithText struct {
-	     *Circle
+		*Circle
+	}
+	//in constructor, assign newly created object to Shape interface value.
+	//so interface will take latest overriding methods.
+	func NewBlueCircleWithText() *BlueCircleWithText {
+		bct := &BlueCircleWithText{NewCircle()}
+		bct.Shape = bct
+		return bct
 	}
 	//override
-	func(bct *BlueCircleWithText) fillColor() {
-	     fmt.Print("Blue")
+	func (bct *BlueCircleWithText) fillColor() {
+		fmt.Print("Blue")
 	}
-	//override draw() to add text annotation
-	func(bct *BlueCircleWithText) draw(sb Shape) {
-	     //extend superclass's draw()
-	     //since we can embed multiple InnerTypes, 
-	     //it is in fact multiple-dispatch: have to name super explicitly
-	     bct.Circle.draw(s)
-	     //add text
-	     fmt.Print("-TextAnnotation")
+	//override and extend
+	func (bct *BlueCircleWithText) draw() {
+		//extend superclass's draw()
+		bct.Circle.draw()
+		//extend with text annotation
+		fmt.Print("-TextAnnotation")
 	}
 ```
    Java code creates a 3 level type hierarchy: BlueCircleWithText <= Circle <= Shape, where BlueCircleWithText is subclass of Circle which is subclass of Shape.

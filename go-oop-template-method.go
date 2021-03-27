@@ -4,37 +4,57 @@ import (
 	"fmt"
 )
 
-//self referential interface to play the role of
+//implement traditional OOP template methods design pattern
+
+//Use interface to play the role of
 //virtual method table of Java class
 //contains methods which need to be overriden/virtual
 type Shape interface {
 	drawBoundary()
 	fillColor()
-	draw(Shape)
+	draw()
 }
 
-//base struct and methods to be embedded/inherited
-type ShapeBase struct{}
+//embed interface to define abstract base class in OOP
+//1. outer structs (embedding this) will "inherit" these interface methods.
+//2. the interface value is nil here, so methods are "abstract".
+type ShapeAbstract struct {
+	Shape
+}
 
-//to be overriden
+//define logic reused in child classes
+func (sa ShapeAbstract) draw() {
+	//following template methods design pattern
+	//invoke virtual/"abstract" methods (defined in interface)
+	sa.drawBoundary()
+	fmt.Print("-")
+	sa.fillColor()
+}
+
+//extends "abstract class" with placeholder methods implementations
+type ShapeBase struct {
+	*ShapeAbstract
+}
+
+//common constructor pattern:
+//override Shape interface value with newly created object.
+//so interface will take latest overriding methods, exactly how OOP overrides works
+func NewShapeBase() *ShapeBase {
+	sb := &ShapeBase{&ShapeAbstract{}}
+	sb.Shape = sb
+	return sb
+}
+
+//override abstract method
 func (sb *ShapeBase) drawBoundary() {
 	//no-op
 	fmt.Print("draw nothing")
 }
 
-//to be overriden
+//override abstract method
 func (sb *ShapeBase) fillColor() {
 	//no-op
 	fmt.Print("fill nothing")
-}
-
-//draw() consumes polymorphic behaviours,
-//so make it accept interface as 1st argument
-func (_ *ShapeBase) draw(sb Shape) {
-	//call methods thru interface for polymorphism
-	sb.drawBoundary()
-	fmt.Print("-")
-	sb.fillColor()
 }
 
 //extend base class thru embedding
@@ -42,8 +62,12 @@ type Circle struct {
 	*ShapeBase
 }
 
+//in constructor, assign newly created object to Shape interface value.
+//so interface will take latest overriding methods.
 func NewCircle() *Circle {
-	return &Circle{&ShapeBase{}}
+	c := &Circle{NewShapeBase()}
+	c.Shape = c
+	return c
 }
 
 //override base method
@@ -56,8 +80,12 @@ type RedRectangle struct {
 	*ShapeBase
 }
 
+//in constructor, assign newly created object to Shape interface value.
+//so interface will take latest overriding methods.
 func NewRedRectangle() *RedRectangle {
-	return &RedRectangle{&ShapeBase{}}
+	rr := &RedRectangle{NewShapeBase()}
+	rr.Shape = rr
+	return rr
 }
 
 //override base method
@@ -75,8 +103,12 @@ type BlueCircleWithText struct {
 	*Circle
 }
 
+//in constructor, assign newly created object to Shape interface value.
+//so interface will take latest overriding methods.
 func NewBlueCircleWithText() *BlueCircleWithText {
-	return &BlueCircleWithText{&Circle{}}
+	bct := &BlueCircleWithText{NewCircle()}
+	bct.Shape = bct
+	return bct
 }
 
 //override
@@ -85,11 +117,11 @@ func (bct *BlueCircleWithText) fillColor() {
 }
 
 //override and extend
-func (bct *BlueCircleWithText) draw(s Shape) {
+func (bct *BlueCircleWithText) draw() {
 	//extend superclass's draw()
 	//since we can embed multiple InnerTypes,
-	//it is in fact multiple-dispatch: have to name super explicitly
-	bct.Circle.draw(s)
+	//it is in fact multiple-inheritance: have to name super explicitly
+	bct.Circle.draw()
 	//extend with text annotation
 	fmt.Print("-TextAnnotation")
 }
@@ -97,7 +129,7 @@ func (bct *BlueCircleWithText) draw(s Shape) {
 func main() {
 	//create array of shapes and invoke its draw()
 	shapes := []Shape{
-		&ShapeBase{},
+		NewShapeBase(),
 		NewCircle(),
 		NewRedRectangle(),
 		NewBlueCircleWithText(),
@@ -105,7 +137,7 @@ func main() {
 	for _, s := range shapes {
 		//note: we have to pass in thru interface value
 		//for polymorphism
-		s.draw(s)
+		s.draw()
 		fmt.Println()
 	}
 }
