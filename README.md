@@ -76,11 +76,40 @@ Or methods defined for functions:
    
    By combining these OOP primitives (matching their counterparts in Java class), we can achieve some traditional OOP designs with simple rules: 
    
-   - every (class like) entity with methods which **provides** polymorphic behaviour(virtual) should define its "virtual" methods in an related "base" interface (corresponding to virtual method table in Java).
-   - define a "abstract" base struct which embed the above "base" interface: common OO language(such as Java) use single-dispatch: methods are dynamically dispacthed based on virtual method table of the 1st (hidden) "self"/"this" argument. To achieve this in Go, define a "abstract" base struct which embed the above "base" interface. Since the default value of interface is nil, the methods in this base struct are "abstract".
-   - use embedding for inheritance: extend the above abstract base struct by embedding it in outer structs.
-   - use shadowing for method overriding: in outer struct, define methods with same signature as methods in "base" interface to override them.
-   - constructor pattern: define constructor function for new outer structs, in constructor, assign/override the embedded "base" interface with itself - the newly created instance, so the embedded "base" interface will take latest overriding methods.
+   - every (class like) entity with methods which **provides** polymorphic behaviours should define these "virtual" methods in an related "base" interface (corresponding to virtual method table in Java):
+```go
+	//classic OOP example: class Shape with subclasses: Circle, Box,...etc.
+	type Shape interface {
+		draw()
+	}   
+```
+   - define a "abstract" base struct which embed the above "base" interface: common OO language(such as Java) use single-dispatch: methods are dynamically dispacthed based on virtual method table of the 1st (hidden) "self"/"this" argument. To achieve this in Go, define a "abstract" base struct which embed the above "base" interface. Since the default value of interface is nil, the methods in this base struct are "abstract":
+```go
+	type ShapeAbstract struct {
+		Shape
+	}
+```
+   - use embedding for inheritance and extension: embed the above interface or abstract base struct in outer structs.
+```go
+	type Circle struct {
+		*ShapeAbstract
+	}
+```
+   - overriding involves two steps:
+     - method override: in outer struct, define methods with same signature as methods in "base" interface to override them:
+```go
+	func (c *Circle) draw() {
+		fmt.Print("Circle")
+	}
+```
+     - embedded "base" interface override: set the embedded "base" interface (Shape) with a instance of outer struct, so the embedded "base" interface will contain latest overriding methods. This is normally done in constructor of outer struct:
+```go
+	func NewCircle() *Cirlce {
+		rc := &Circle{&ShapeAbstract{}}
+		rc.Shape = rc
+		return rc
+	}
+```
 
    Let's implement the ["template methods"](https://en.wikipedia.org/wiki/Template_method_pattern) design pattern using Go.
    
