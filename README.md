@@ -97,21 +97,19 @@ Or methods defined for functions:
 ```
    - overriding involves two steps:
        - method override: in outer struct, define methods with same signature as methods in "base" interface to override them:
-<!-- -->
-```go
+       ```go
 	func (c *Circle) draw() {
 		fmt.Print("Circle")
 	}
-```
+       ```
        - embedded "base" interface override: set the embedded "base" interface (Shape) with a instance of outer struct, so the embedded "base" interface will contain latest overriding methods. This is normally done in constructor of outer struct: 
-<!-- -->
-```go
+       ```go
 	func NewCircle() *Cirlce {
 		rc := &Circle{&ShapeAbstract{}}
 		rc.Shape = rc
 		return rc
 	}
-```
+       ```
 
    Let's implement the ["template methods"](https://en.wikipedia.org/wiki/Template_method_pattern) design pattern using Go.
    
