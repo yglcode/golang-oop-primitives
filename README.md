@@ -72,7 +72,7 @@ Or methods defined for functions:
    
    Go is flatly against these designs based on class hierarch compositions. Go's disintegration of these OOP primitives also guard against these kind of designs. That make people think/complain Go is not a OOP language.
    
-   **_Warning: the following are discouraged practice, just for experiementation._**
+   **_Warning: the following are not encouraged practice, just for experiementation._**
    
    By combining these OOP primitives (matching their counterparts in Java class), we can achieve some traditional OOP designs with simple rules: 
    
