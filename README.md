@@ -96,13 +96,13 @@ Or methods defined for functions:
 	}
 ```
    - overriding involves two steps:
-     - method override: in outer struct, define methods with same signature as methods in "base" interface to override them:
+     * method override: in outer struct, define methods with same signature as methods in "base" interface to override them:
 ```go
 	func (c *Circle) draw() {
 		fmt.Print("Circle")
 	}
 ```
-     - embedded "base" interface override: set the embedded "base" interface (Shape) with a instance of outer struct, so the embedded "base" interface will contain latest overriding methods. This is normally done in constructor of outer struct:
+     * embedded "base" interface override: set the embedded "base" interface (Shape) with a instance of outer struct, so the embedded "base" interface will contain latest overriding methods. This is normally done in constructor of outer struct:
 ```go
 	func NewCircle() *Cirlce {
 		rc := &Circle{&ShapeAbstract{}}
