@@ -37,7 +37,7 @@ type ShapeBase struct {
 }
 
 //common constructor pattern:
-//override embedded Shape interface value with newly created object.
+//override embedded Shape interface value with itself - newly created object.
 //so interface will take latest overriding methods, exactly how OOP overrides works
 func NewShapeBase() *ShapeBase {
 	sb := &ShapeBase{&ShapeAbstract{}}
@@ -62,7 +62,7 @@ type Circle struct {
 	*ShapeBase
 }
 
-//in constructor, assign newly created object to embedded Shape interface value.
+//in constructor, assign itself - newly created object to embedded Shape interface value.
 //so interface will take latest overriding methods.
 func NewCircle() *Circle {
 	c := &Circle{NewShapeBase()}
@@ -80,7 +80,7 @@ type RedRectangle struct {
 	*ShapeBase
 }
 
-//in constructor, assign newly created object to embedded Shape interface value.
+//in constructor, assign itself - newly created object to embedded Shape interface value.
 //so interface will take latest overriding methods.
 func NewRedRectangle() *RedRectangle {
 	rr := &RedRectangle{NewShapeBase()}
@@ -103,7 +103,7 @@ type BlueCircleWithText struct {
 	*Circle
 }
 
-//in constructor, assign newly created object to embedded Shape interface value.
+//in constructor, assign itself - newly created object to embedded Shape interface value.
 //so interface will take latest overriding methods.
 func NewBlueCircleWithText() *BlueCircleWithText {
 	bct := &BlueCircleWithText{NewCircle()}

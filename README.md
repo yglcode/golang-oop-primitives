@@ -80,7 +80,7 @@ Or methods defined for functions:
    - define a "abstract" base struct which embed the above "base" interface: common OO language(such as Java) use single-dispatch: methods are dynamically dispacthed based on virtual method table of the 1st (hidden) "self"/"this" argument. To achieve this in Go, define a "abstract" base struct which embed the above "base" interface. Since the default value of interface is nil, the methods in this base struct are "abstract".
    - use embedding for inheritance: extend the above abstract base struct by embedding it in outer structs.
    - use shadowing for method overriding: in outer struct, define methods with same signature as methods in "base" interface to override them.
-   - constructor pattern: define constructor function for new outer structs, in constructor, assign/override the embedded "base" interface with newly created instance, so the embedded "base" interface will take latest overriding methods.
+   - constructor pattern: define constructor function for new outer structs, in constructor, assign/override the embedded "base" interface with itself - the newly created instance, so the embedded "base" interface will take latest overriding methods.
 
    Let's implement the ["template methods"](https://en.wikipedia.org/wiki/Template_method_pattern) design pattern using Go.
    
@@ -128,7 +128,7 @@ Or methods defined for functions:
 		sa.fillColor()
 	}
 ```
-   Then define a base struct to extend/embed this "abstract" struct and define placeholder methods. Please note the "constructor pattern" which overrides embedded "Shape" interface value with newly created object.
+   Then define a base struct to extend/embed this "abstract" struct and define placeholder methods. Please note the "constructor pattern" which overrides embedded "Shape" interface value with itself - newly created object.
 ```go
 	//extends "abstract class" with placeholder methods implementations
 	type ShapeBase struct {
@@ -136,7 +136,7 @@ Or methods defined for functions:
 	}
 
 	//common constructor pattern:
-	//override Shape interface value with newly created object.
+	//override embedded Shape interface value with itself - newly created object.
 	//so interface will take latest overriding methods, exactly how OOP overrides works
 	func NewShapeBase() *ShapeBase {
 		sb := &ShapeBase{&ShapeAbstract{}}
@@ -168,13 +168,13 @@ Or methods defined for functions:
 	Shape[] shapes = {new Shape(),new RedRectangle()};
 	for(Shape s: shapes) { s.draw(); }
 ```
-   In Go, use embedding for inheritance and please note the "constructor pattern" which overrides the embedded Shape interface value with newly created object.
+   In Go, use embedding for inheritance and please note the "constructor pattern" which overrides the embedded Shape interface value with itself - newly created object.
 ```go
         //embed base struct for inheritance
 	type RedRectangle struct {
 	     *ShapeBase
 	}
-	//in constructor, assign newly created object to Shape interface value.
+	//in constructor, assign itself - newly created object to embedded Shape interface value.
 	//so interface will take latest overriding methods.
 	func NewRedRectangle() *RedRectangle {
 		rr := &RedRectangle{NewShapeBase()}
@@ -214,7 +214,7 @@ Or methods defined for functions:
 	type BlueCircleWithText struct {
 		*Circle
 	}
-	//in constructor, assign newly created object to Shape interface value.
+	//in constructor, assign itself - newly created object to embedded Shape interface value.
 	//so interface will take latest overriding methods.
 	func NewBlueCircleWithText() *BlueCircleWithText {
 		bct := &BlueCircleWithText{NewCircle()}
