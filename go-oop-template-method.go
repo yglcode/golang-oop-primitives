@@ -135,8 +135,6 @@ func main() {
 		NewBlueCircleWithText(),
 	}
 	for _, s := range shapes {
-		//note: we have to pass in thru interface value
-		//for polymorphism
 		s.draw()
 		fmt.Println()
 	}
