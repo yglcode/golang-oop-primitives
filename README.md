@@ -38,7 +38,7 @@ Or methods defined for functions:
 
 ### **2. Embedding: for code reuse and delegation.** ###
 
-   In traditional OOP, one purpose of inheritance is for code reuse: subclasses inherit(or embed in layout) properties and methods of superclass. And inheritance set up "is-a" relation among two types: subclass can be used in anywhere superclass is expected.
+   In traditional OOP, one purpose of inheritance is for code reuse: subclasses inherit (or embed a copy in layout) properties and methods of superclass. And inheritance set up "is-a" relation among two types: subclass can be used in anywhere superclass is expected.
    
    In Go, a "outer" struct type can [embed](https://golang.org/ref/spec#Struct_types) another "inner" type to reuse inner's code and logic :
 ```go
@@ -58,11 +58,11 @@ Or methods defined for functions:
 
 ### **3. Interface: for polymorphism.** ###
 
-   In traditional OOP, runtime polymorphism is achieved thru **virtual method table (VMT) and overrides**. Superclass can define set of virtual methods for abstraction while subclass can override virtual methods for extension and variation. VMTs is inherently bound with classes. In Java, all methods are virtual and all classes has its VMT. 
+   In traditional OOP, runtime polymorphism is achieved thru **virtual method table (VMT) and overrides**. Superclass can define set of virtual methods for abstraction while subclass can override virtual methods for extension and variation. As the core of class hierarchy based composition, VMTs is inherently bound with classes. In Java, all methods are virtual and all classes has its VMT. 
    
    In Go, interfaces play the role (contains) the virtual method table [[Ian Lance Taylor blog](https://www.airs.com/blog/archives/277)]. If you invoke a object's method directly on itself, it is statically dispatched. If you assign an object to an interface value and invoke methods thru the interface, they are dynamically dispatched. 
 
-   However Go interfaces are independent entities separate from structs or others (class-like entities) with methods. All Go methods are early bound and statically dispatched by default. Interface allows **consumers** to specify what polymorphic behaviors it is expecting. Totally unrelated components can satisfy/provide the same interface independently and implicitly (no need for "implements"). While in Java, all classes which provide/implement Java interface or VMT (ie. all interface **providers**) must be in the same class tree as interface.
+   However Go interfaces are independent entities separate from structs or others (class-like entities) with methods. All Go methods are early bound and statically dispatched by default. So Go's interface itself doesn't enable class hierarchy based composition. Instead interface allows **consumers** to specify what polymorphic behaviors it is expecting. Totally unrelated components can satisfy/provide the same interface independently and implicitly (no need for "implements"). While in Java, all classes which provide/implement Java interface or VMT (ie. all interface **providers**) must be in the same class tree as interface.
    
    Interfaces can embed other interfaces; this interface embedding setup "is-a" relation among OuterInterface and InnerInterface: OuterInterface can be used where InnerInterface is required. So we can build hierarchy of abstractions only with interfaces, without implementation details.
  
