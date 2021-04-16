@@ -34,7 +34,7 @@ Or methods defined for functions:
 	}
 	func (p *Node) AddEdge(e *Edge) {...}
 ```
-   All these methods are by default (or by itself) early-bound and statically dispatched (not virtual). They are only dynamically dispatched when invoked thru interfaces (more on this later).
+   All these methods are by default early-bound and statically dispatched (not virtual). They are only dynamically dispatched when invoked thru interfaces (more on this later).
 
 ### **2. Embedding: for code reuse and delegation.** ###
 
@@ -58,9 +58,9 @@ Or methods defined for functions:
 
 ### **3. Interface: for polymorphism.** ###
 
-   In traditional OOP, runtime polymorphism is achieved thru **virtual method table (VMT) and overrides**. Superclass can define set of virtual methods for abstraction while subclass can override virtual methods for extension and variation. As the core of class hierarchy based composition, VMTs is inherently bound with classes. In Java, all methods are virtual and all classes has its VMT. 
+   In traditional OOP, runtime polymorphism is achieved thru **virtual method table (VMT) and overrides**. Superclass can define set of virtual methods for abstraction while subclass can override virtual methods for extension and variation. As the core of class hierarchy based composition, VMTs is inherently bound with classes. In Java, by default methods are virtual and all classes has its VMT. 
    
-   In Go, interfaces play the role (contains) the virtual method table [[Ian Lance Taylor blog](https://www.airs.com/blog/archives/277)]. If you invoke a object's method directly on itself, it is statically dispatched. If you assign an object to an interface value and invoke methods thru the interface, they are dynamically dispatched. 
+   In Go, interfaces play the role (contains) the virtual method table [[Russ Cox blog](https://research.swtch.com/interfaces)][[Ian Lance Taylor blog](https://www.airs.com/blog/archives/277)]. If you invoke a object's method directly on itself, it is statically dispatched. If you assign an object to an interface value and invoke methods thru the interface, they are dynamically dispatched. 
 
    However Go interfaces are independent entities separate from structs or others (class-like entities) with methods. All Go methods are early bound and statically dispatched by default. So Go's interface itself doesn't enable class hierarchy based composition. Instead interface allows **consumers** to specify what polymorphic behaviors it is expecting. Totally unrelated components can satisfy/provide the same interface independently and implicitly (no need for "implements"). While in Java, all classes which provide/implement Java interface or VMT (ie. all interface **providers**) must be in the same class tree as interface.
    
@@ -68,9 +68,9 @@ Or methods defined for functions:
  
 ### **4. How to use these primitives for traditional inheritance based OOP:** ###
 
-   In traditional OOP (Java), classes integrate the above 3 OOP primitives into a unseparatable whole: methods, inheritance/embedding, virtual method table and overrides. This integration results in some class hierarchy based [design patterns](https://en.wikipedia.org/wiki/Design_Patterns) whose advatanges and disadvantages are broadly known.
+   In traditional OOP (Java), classes integrate the above 3 OOP primitives into a inseparatable whole: methods, inheritance/embedding, virtual method table and overrides. This integration results in some class hierarchy based [design patterns](https://en.wikipedia.org/wiki/Design_Patterns) whose advatanges and disadvantages are broadly known.
    
-   Go is flatly against these designs based on class hierarch compositions. Go's disintegration of these OOP primitives also guard against these kind of designs. That make people think/complain Go is not a OOP language.
+   Go is flatly against these designs based on class hierarchy compositions. Go's disintegration of these OOP primitives also guard against these kind of designs. That make people think/complain Go is not a OOP language.
    
    **_Warning: the following are not encouraged practice, just for experiementation._**
    
@@ -83,7 +83,7 @@ Or methods defined for functions:
 		draw()
 	}   
 ```
-   - define a base struct which embed the above "base" interface (as virtual method table in Java): common OO languages (such as Java) use single-dispatch: methods are dynamically dispacthed based on virtual method table of the 1st (hidden) "self"/"this" argument. To achieve this in Go, define a base struct which embed the above "base" interface. Since the default value of interface is nil, the methods in this base struct are "abstract":
+   - define a base struct which embed the above "base" interface (as virtual method table in Java): common OO languages (such as Java) use single-dispatch: methods are dynamically dispatched based on virtual method table of the 1st (hidden) "self"/"this" argument. To achieve this in Go, define a base struct which embed the above "base" interface. Since the default value of interface is nil, the methods in this base struct are "abstract". "Default"/"stub" methods implementations should be provided in base struct or by embedding base struct and overriding/shadowing the methods:
 ```go
 	type ShapeAbstract struct {
 		Shape
@@ -116,18 +116,18 @@ Or methods defined for functions:
    In the following Java class Shape, we have three (virtual) methods "drawBoundary(), fillColor()" for extension in subclasses, define reused logic in draw():
 ```java
 	class Shape {
-	   //extension point
-	   void drawBoundary() { 
+        //extension point
+        void drawBoundary() { 
            	//no-op
            	out.print("draw nothing");
-       	   }
-           //extension point
-           void fillColor() { 
+        }
+        //extension point
+        void fillColor() { 
            	//no-op
            	out.print("fill nothing");
-           }
-       	   //logic reused in subclasses
-           void draw() {
+        }
+       	//logic reused in subclasses
+        void draw() {
 	      drawBoundary();
 	      fillColor();
 	   }
@@ -199,7 +199,7 @@ Or methods defined for functions:
 ```
    In Go, use embedding for inheritance and please note the "constructor pattern" which overrides the embedded Shape interface value with itself - newly created object.
 ```go
-        //embed base struct for inheritance
+    //embed base struct for inheritance
 	type RedRectangle struct {
 	     *ShapeBase
 	}
