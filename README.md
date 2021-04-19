@@ -266,7 +266,7 @@ Or methods defined for functions:
 
    Go code creates a 3 parts delegation chain: BlueCircleWithText -> Circle -> ShapeBase, where all 3 are indepedent types and they all satisfy the Shape interface.
 
-    Again, although we can simulate traditional OOP by combining Go's OOP primitives, it is not encouraged practice.
+   Again, although we can simulate traditional OOP by combining Go's OOP primitives, it is not encouraged practice.
 
    [Java](https://github.com/yglcode/golang-oop-primitives/blob/main/TemplateMethods.java) and [Go code](https://github.com/yglcode/golang-oop-primitives/blob/main/go-oop-template-method.go) can be found at [https://github.com/yglcode/golang-oop-primitives](https://github.com/yglcode/golang-oop-primitives).
 
