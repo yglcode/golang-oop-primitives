@@ -1,6 +1,6 @@
 ## Golang OOP primitives ##
 
-### _traditional OOP thru "Embedded Interface" and Go prefered composition_ ###
+### _traditional OOP thru "Embedded Interface" and Go preferred composition_ ###
    
 
 Golang is not a traditional object oriented programming language. Instead, it distilled a few OO programming primitives and allow you to compose them to achieve different OO designs.
