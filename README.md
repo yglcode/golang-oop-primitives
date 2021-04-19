@@ -270,7 +270,7 @@ Or methods defined for functions:
 
    [Java](https://github.com/yglcode/golang-oop-primitives/blob/main/TemplateMethods.java) and [Go code](https://github.com/yglcode/golang-oop-primitives/blob/main/go-oop-template-method.go) can be found at [https://github.com/yglcode/golang-oop-primitives](https://github.com/yglcode/golang-oop-primitives).
 
-### **5. Go's typical composition: Simple Control Flow (Readability), Small Interfaces (Separation of Concerns)
+### **5. Go's typical composition: Simple Control Flow (Readability), Small Interfaces (Separation of Concerns)** ###
 
     One issue of the above "template methods" design pattern is complicate control flow. Invoking a method may involve jumping up and down the inheritance hierarchy multiple times.
     
@@ -278,7 +278,7 @@ Or methods defined for functions:
     
     BlueCircleWithText.draw() -> Shape.draw() -> Circle.drawBoundary() -> BlueCircleWithText.fillColor() -> back to Shape.draw() -> BlueCircleWithText.draw() complete.
     
-    It is common in OOP frameworks, 
+    It is common in OOP frameworks, some calls will go up and down inheritance hierarchy multiple times.
     
     Similarly, in the above Go code implementing "template methods" design, the control flow is jumping back and forth in the delegation chain.
     
