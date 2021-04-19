@@ -282,7 +282,7 @@ It is not uncommon in OOP frameworks, some calls will go up and down inheritance
     
 Similarly, in the above Go code implementing "template methods" design, the control flow is jumping back and forth in the delegation chain.
     
-Embedding is used in many places inside Go standard packages, and control flow only goes in one direction: embedding struct -> embedded struct.
+Embedding is used in many places inside Go standard packages, and control flow only goes in one direction: outer/embedding struct -> inner/embedded struct.
     
 Go prefers simple straight-forward control flow which is consistent with the way how human read and understand (readability and maintainability). A prime example of this is how traditional epoll-based networking code is callback based and driven by IO events, which results in network app code flow broken up and jump thru different callback functions. In Go, by using channel and goroutine(coroutines), network app code flow becomes a simple sequential flow from top to bottom, which is easier to understand and maintain.
     
@@ -290,7 +290,7 @@ Another Go's design [proverbs](https://go-proverbs.github.io/) is preference for
     
 In Go, interfaces allow *consumer* code specify what polymorphic behaviors it expects. Reexaming above "Shape" interface, we can find it has two consumers, and Shape interface is in fact a mix of two separate method-sets:
     
-1st consumer is client code which call/use the hierachy of Shape / Circle / Rectangle /..., which expects something *drawable*:
+1st consumer is client code which call/use the hierarchy of Shape / Circle / Rectangle /..., which expects something *drawable*:
 ```go
     type Drawable interface {
         draw()
