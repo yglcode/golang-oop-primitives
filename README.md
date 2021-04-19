@@ -1,6 +1,6 @@
 ## Golang OOP primitives ##
 
-### _and combine them to do traditional OOP thru "Embedded Interface"_ ###
+### _traditional OOP thru "Embedded Interface" and Go prefered composition_ ###
    
 
 Golang is not a traditional object oriented programming language. Instead, it distilled a few OO programming primitives and allow you to compose them to achieve different OO designs.
@@ -270,4 +270,59 @@ Or methods defined for functions:
 
    [Java](https://github.com/yglcode/golang-oop-primitives/blob/main/TemplateMethods.java) and [Go code](https://github.com/yglcode/golang-oop-primitives/blob/main/go-oop-template-method.go) can be found at [https://github.com/yglcode/golang-oop-primitives](https://github.com/yglcode/golang-oop-primitives).
 
+### **5. Go's typical composition: Simple Control Flow (Readability), Small Interfaces (Separation of Concerns)
 
+    One issue of the above "template methods" design pattern is complicate control flow. Invoking a method may involve jumping up and down the inheritance hierarchy multiple times.
+    
+    In above sample Java code, BlueCircleWithText.draw() call path will be:
+    
+    BlueCircleWithText.draw() -> Shape.draw() -> Circle.drawBoundary() -> BlueCircleWithText.fillColor() -> back to Shape.draw() -> BlueCircleWithText.draw() complete.
+    
+    It is common in OOP frameworks, 
+    
+    Similarly, in the above Go code implementing "template methods" design, the control flow is jumping back and forth in the delegation chain.
+    
+    Embedding is used in many places inside Go standard packages, and control flow only goes in one direction: embedding struct -> embedded struct.
+    
+    Go prefers simple straight-forward control flow which is consistent with the way how human read and understand (readability and maintainability). A prime example of this is how traditional epoll-based networking code is callback based and driven by IO events, which results in network app code flow broken up and jump thru different callback functions. In Go, by using channel and goroutine(coroutines), network app code flow becomes a simple sequential flow from top to bottom, which is easier to understand and maintain.
+    
+    Another Go's design [proverbs](https://go-proverbs.github.io/) is preference for small interfaces. The prime examples are [io.Reader](https://golang.org/pkg/io/#Reader) and [io.Writer](https://golang.org/pkg/io/#Writer) which have one method. Small interfaces encourage separation of concerns and better abstraction. 
+    
+    In Go, interfaces allow *consumer* code specify what polymorphic behaviors it expects. Reexaming above "Shape" interface, we can find it has two consumers, and Shape interface is in fact a mix of two separate method-sets:
+    
+    1st consumer is client code which call/use the hierachy of Shape / Circle / Rectangle /..., which expects something *drawable*:
+```go
+    type Drawable interface {
+        draw()
+    }
+    //so client code can draw a list of shapes:
+    shapes := []Drawable{NewCircle(),NewRectanlge(),...}
+    for _,s := range shapes { s.draw() }
+```
+    2nd consumer is internal implementation of "draw()" method which need to be customized by polymorphic "drawBoundary()" and "fillColor()" methods. If we assume this customization is a valid design decision, we could have simpler implementation without embedding and overriding as following:
+```go
+    type DrawOperations interface {
+        drawBoundary()
+        fillColor()
+    }
+    // shared/reused logic
+    func commonDraw(ops DrawOperations) {
+        ...
+        ops.drawBoundary()
+        ...
+        ops.fillColor()
+        ...
+    }
+    // various shapes can be defined without embedding
+    type RedCircle struct {}
+    func (rc *RedCircle) drawBoundary() {
+        fmt.Print("Circle")
+    }
+    func (rc *RedCircle) fillColor() {
+        fmt.Print("Red")
+    }
+    func (rc *RedCircle) draw() {
+        commonDraw(rc)
+        ...other customizations...
+    }
+```
