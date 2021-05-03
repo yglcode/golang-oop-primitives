@@ -288,7 +288,7 @@ Go prefers simple straight-forward control flow which is consistent with the way
     
 Another Go's design [proverbs](https://go-proverbs.github.io/) is preference for small interfaces. The prime examples are [io.Reader](https://golang.org/pkg/io/#Reader) and [io.Writer](https://golang.org/pkg/io/#Writer) which have one method. Small interfaces encourage separation of concerns and better abstraction. 
     
-In Go, interfaces allow *consumer* code specify what polymorphic behaviors it expects. Reexaming above "Shape" interface, we can find it has two consumers, and Shape interface is in fact a mix of two separate method-sets:
+In Go, interfaces allow *consumer* code specify what polymorphic behaviors it expects. Reexamining above "Shape" interface, we can find it has two consumers, and Shape interface is in fact a mix of two separate method-sets:
     
 1st consumer is client code which call/use the hierarchy of Shape / Circle / Rectangle /..., which expects something *drawable*:
 ```go
